@@ -22,14 +22,14 @@ A Spring Boot REST API application for managing shopping lists.
 ### Prerequisites
 
 - Java 21
-- Maven 3.6+ (or use the included Maven wrapper)
+- Maven 3.6+
 
 ### Local Development
 
 1. Clone the repository
 2. Run the application:
    ```bash
-   ./mvnw spring-boot:run
+   mvn spring-boot:run
    ```
 3. The application will start on http://localhost:8080
 
@@ -108,5 +108,5 @@ Base URL: `http://localhost:8080/shopping-items`
 
 Run tests with:
 ```bash
-./mvnw test
+mvn test
 ```
