@@ -33,6 +33,15 @@ A Spring Boot REST API application for managing shopping lists.
    ```
 3. The application will start on http://localhost:8080
 
+### API Documentation
+
+Once the application is running, you can access the interactive API documentation:
+
+- **Swagger UI**: http://localhost:8080/swagger-ui/index.html
+- **OpenAPI JSON**: http://localhost:8080/v3/api-docs
+
+The Swagger UI provides an interactive interface to test all the API endpoints directly from your browser.
+
 ### Using Docker
 
 1. Build the Docker image:
@@ -47,62 +56,6 @@ A Spring Boot REST API application for managing shopping lists.
 
 3. Access the application at http://localhost:8080
 
-## API Endpoints
-
-Base URL: `http://localhost:8080/shopping-items`
-
-### Get All Shopping Items
-- **GET** `/shopping-items`
-- **Description**: Retrieve a paginated list of all shopping items
-- **Parameters**: 
-  - `page` (optional): Page number (default: 0)
-  - `size` (optional): Page size (default: 20)
-  - `sort` (optional): Sort criteria (e.g., `name,asc`)
-- **Response**: Paginated list of shopping items
-
-### Create Shopping Item
-- **POST** `/shopping-items`
-- **Description**: Create a new shopping item
-- **Request Body**:
-  ```json
-  {
-    "name": "string",
-    "price": "decimal",
-    "quantity": "integer",
-    "category": "string"
-  }
-  ```
-- **Response**: Created shopping item with generated ID
-
-### Get Shopping Item by ID
-- **GET** `/shopping-items/{id}`
-- **Description**: Retrieve a specific shopping item by its ID
-- **Parameters**: 
-  - `id` (path): Shopping item ID
-- **Response**: Shopping item details
-
-### Update Shopping Item
-- **PUT** `/shopping-items/{id}`
-- **Description**: Update an existing shopping item
-- **Parameters**: 
-  - `id` (path): Shopping item ID
-- **Request Body**:
-  ```json
-  {
-    "name": "string",
-    "price": "decimal",
-    "quantity": "integer",
-    "category": "string"
-  }
-  ```
-- **Response**: Updated shopping item
-
-### Delete Shopping Item
-- **DELETE** `/shopping-items/{id}`
-- **Description**: Delete a shopping item by its ID
-- **Parameters**: 
-  - `id` (path): Shopping item ID
-- **Response**: Empty response with 200 status
 
 ## Testing
 

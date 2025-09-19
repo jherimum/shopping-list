@@ -2,19 +2,24 @@ package com.eugenio.shopping_list_app.controller;
 
 import com.eugenio.shopping_list_app.repository.ShoppingItem;
 import com.eugenio.shopping_list_app.service.ShoppingItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 
 import java.util.function.Function;
 
 @RestController
-@RequestMapping("/shopping-items")  // 👈 base path for this controller
+@RequestMapping("/shopping-items")
+@Tag(name = "Shopping Items", description = "Operations for managing shopping items")
 public class ShoppingItemController {
 
     private static final Function<ShoppingItemData, ShoppingItem> TO_ENTITY = (req) -> {
@@ -29,30 +34,62 @@ public class ShoppingItemController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ShoppingItem>> query( Pageable pageable){
-        return ResponseEntity.ok(this.shoppingItemService.find(pageable));
+    @Operation(summary = "Get all shopping items", description = "Retrieve a paginated list of all shopping items")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved shopping items")
+    })
+    public ResponseEntity<Page<ShoppingItem>> query(
+            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "20") int size){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return ResponseEntity.ok(this.shoppingItemService.find(pageRequest));
     }
 
     @PostMapping
-    public ResponseEntity<ShoppingItem> create(@RequestBody ShoppingItemData request){
+    @Operation(summary = "Create a shopping item", description = "Create a new shopping item")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Shopping item created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data")
+    })
+    public ResponseEntity<ShoppingItem> create(
+            @Parameter(description = "Shopping item data to create") @RequestBody ShoppingItemData request){
         var saved = this.shoppingItemService.saveOrUpdate(TO_ENTITY.apply(request));
-        var link = linkTo(methodOn(ShoppingItemController.class).get(saved.getId()));
-        return ResponseEntity.created(link.toUri()).body(saved);
+        return ResponseEntity.status(201).body(saved);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<ShoppingItem> get(@PathVariable("id") long id) {
+    @Operation(summary = "Get shopping item by ID", description = "Retrieve a specific shopping item by its ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Shopping item found"),
+        @ApiResponse(responseCode = "404", description = "Shopping item not found")
+    })
+    public ResponseEntity<ShoppingItem> get(
+            @Parameter(description = "Shopping item ID") @PathVariable("id") long id) {
         return ResponseEntity.ok(retrieveShoppingItem(id));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
+    @Operation(summary = "Delete shopping item", description = "Delete a shopping item by its ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Shopping item deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Shopping item not found")
+    })
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "Shopping item ID") @PathVariable("id") long id) {
         this.shoppingItemService.delete(id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<ShoppingItem> update(@PathVariable("id") long id, @RequestBody ShoppingItemData request) {
+    @Operation(summary = "Update shopping item", description = "Update an existing shopping item")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Shopping item updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Shopping item not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data")
+    })
+    public ResponseEntity<ShoppingItem> update(
+            @Parameter(description = "Shopping item ID") @PathVariable("id") long id, 
+            @Parameter(description = "Updated shopping item data") @RequestBody ShoppingItemData request) {
         var shoppingItem = retrieveShoppingItem(id);
         shoppingItem.setCategory(request.category());
         shoppingItem.setName(request.name());
