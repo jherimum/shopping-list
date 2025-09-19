@@ -44,17 +44,10 @@ class ShoppingItemControllerTest {
         Assertions.assertEquals(ResponseEntity.ok(shoppingItem), shoppingItemController.get(1));
     }
 
-    @Test
-    void test_get_should_throw_exception_when_shopping_item_was_not_deleted() {
-        Mockito.when(shoppingItemService.delete(Mockito.anyLong())).thenReturn(false);
-        RestException.NotFoundException exception = Assertions.assertThrows(RestException.NotFoundException.class, () -> {
-            shoppingItemController.delete(1);
-        });
-    }
 
     @Test
-    void test_get_shoudl_return_ok_when_deleted() {
-        Mockito.when(shoppingItemService.delete(Mockito.anyLong())).thenReturn(true);
+    void test_get_should_return_ok_when_deleted() {
+        Mockito.doNothing().when(shoppingItemService).delete(Mockito.anyLong());
         Assertions.assertEquals(ResponseEntity.ok().build(), shoppingItemController.delete(1));
     }
 

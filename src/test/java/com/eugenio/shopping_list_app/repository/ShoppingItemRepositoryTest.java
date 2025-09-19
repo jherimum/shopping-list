@@ -12,19 +12,6 @@ class ShoppingItemRepositoryTest {
     @Autowired
     private ShoppingItemRepository shoppingItemRepository;
 
-    @Test
-    void test_delete() {
-        var deleted_count = shoppingItemRepository.delete(1);
-        assertEquals(0, deleted_count);
-
-        var shoppingItem = ShoppingItem.builder().build();
-        var saved = this.shoppingItemRepository.save(shoppingItem);
-
-        deleted_count = shoppingItemRepository.delete(saved.getId());
-        assertEquals(1, deleted_count);
-
-        assertEquals(0, shoppingItemRepository.count());
-    }
 
 
 }

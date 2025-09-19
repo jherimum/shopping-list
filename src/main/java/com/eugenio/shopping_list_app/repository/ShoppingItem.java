@@ -1,26 +1,46 @@
 package com.eugenio.shopping_list_app.repository;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 import java.util.StringJoiner;
 
+@Getter
 @Entity
 @Table(name = "shopping_items")
-@Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@EntityListeners(AuditingEntityListener.class) // Crucial for auditing listeners
 public class ShoppingItem {
 
-    private final String name;
-    private final BigDecimal price;
-    private final int quantity;
-    private final String category;
+    @Setter
+    private String name;
+    @Setter
+    private BigDecimal price;
+    @Setter
+    private int quantity;
+    @Setter
+    private String category;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedAt;
+
+
 
     @Builder
     public ShoppingItem(String name, BigDecimal price, int quantity, String category) {
@@ -28,6 +48,11 @@ public class ShoppingItem {
         this.price = price;
         this.quantity = quantity;
         this.category = category;
+    }
+
+    @JsonIgnore
+    public boolean isPersisted() {
+        return null != this.id;
     }
 
     public BigDecimal getCost() {
