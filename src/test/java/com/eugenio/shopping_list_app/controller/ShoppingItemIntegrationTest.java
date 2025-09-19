@@ -206,7 +206,13 @@ public class ShoppingItemIntegrationTest {
         mockMvc.perform(post("/shopping-items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidData)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("Validation failed")))
+                .andExpect(jsonPath("$.message", is("The request contains invalid data. Please check the fields and try again.")))
+                .andExpect(jsonPath("$.fieldErrors.name", is("Name is required")))
+                .andExpect(jsonPath("$.fieldErrors.price", is("Price is required")))
+                .andExpect(jsonPath("$.fieldErrors.quantity", is("Quantity must be greater than zero")))
+                .andExpect(jsonPath("$.fieldErrors.category", is("Category is required")));
     }
 
     @Test
@@ -236,7 +242,9 @@ public class ShoppingItemIntegrationTest {
         mockMvc.perform(post("/shopping-items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidData)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("Validation failed")))
+                .andExpect(jsonPath("$.fieldErrors.price", is("Price must be greater than or equal to zero")));
     }
 
     @Test
