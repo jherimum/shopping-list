@@ -41,6 +41,9 @@ public class ShoppingItemController {
     public ResponseEntity<Page<ShoppingItem>> query(
             @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "20") int size){
+        if (page < 0 || size < 1) {
+            return ResponseEntity.badRequest().build();
+        }
         PageRequest pageRequest = PageRequest.of(page, size);
         return ResponseEntity.ok(this.shoppingItemService.find(pageRequest));
     }
