@@ -17,7 +17,8 @@ import java.math.BigDecimal;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,15 +43,15 @@ public class ShoppingItemIntegrationTest {
     @Test
     void shouldCreateShoppingItem() throws Exception {
         ShoppingItemData itemData = new ShoppingItemData(
-            "Test Item", 
-            BigDecimal.valueOf(9.99), 
-            2, 
-            "Test Category"
+                "Test Item",
+                BigDecimal.valueOf(9.99),
+                2,
+                "Test Category"
         );
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(itemData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(itemData)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is("Test Item")))
                 .andExpect(jsonPath("$.price", is(9.99)))
@@ -89,15 +90,15 @@ public class ShoppingItemIntegrationTest {
         ShoppingItem savedItem = repository.save(item);
 
         ShoppingItemData updateData = new ShoppingItemData(
-            "Updated Item", 
-            BigDecimal.valueOf(15.99), 
-            5, 
-            "Updated Category"
+                "Updated Item",
+                BigDecimal.valueOf(15.99),
+                5,
+                "Updated Category"
         );
 
         mockMvc.perform(put("/shopping-items/{id}", savedItem.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateData)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(savedItem.getId().intValue())))
                 .andExpect(jsonPath("$.name", is("Updated Item")))
@@ -143,8 +144,8 @@ public class ShoppingItemIntegrationTest {
         }
 
         mockMvc.perform(get("/shopping-items")
-                .param("page", "1")
-                .param("size", "5"))
+                        .param("page", "1")
+                        .param("size", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(5)))
                 .andExpect(jsonPath("$.totalElements", is(15)))
@@ -162,8 +163,8 @@ public class ShoppingItemIntegrationTest {
         }
 
         mockMvc.perform(get("/shopping-items")
-                .param("page", "2")
-                .param("size", "5"))
+                        .param("page", "2")
+                        .param("size", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
                 .andExpect(jsonPath("$.totalElements", is(12)))
@@ -189,13 +190,13 @@ public class ShoppingItemIntegrationTest {
         repository.save(new ShoppingItem("Test Item", BigDecimal.valueOf(10), 1, "Category"));
 
         mockMvc.perform(get("/shopping-items")
-                .param("page", "-1")
-                .param("size", "10"))
+                        .param("page", "-1")
+                        .param("size", "10"))
                 .andExpect(status().isBadRequest());
-        
+
         mockMvc.perform(get("/shopping-items")
-                .param("page", "0")
-                .param("size", "0"))
+                        .param("page", "0")
+                        .param("size", "0"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -204,8 +205,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData(null, null, 0, null);
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("Validation failed")))
                 .andExpect(jsonPath("$.message", is("The request contains invalid data. Please check the fields and try again.")))
@@ -220,8 +221,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData("", BigDecimal.valueOf(10), 1, "Category");
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -230,8 +231,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), 1, "");
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -240,8 +241,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(-1), 1, "Category");
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("Validation failed")))
                 .andExpect(jsonPath("$.fieldErrors.price", is("Price must be greater than or equal to zero")));
@@ -252,8 +253,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), 0, "Category");
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -262,8 +263,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), -1, "Category");
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -272,8 +273,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData validData = new ShoppingItemData("Free Item", BigDecimal.ZERO, 1, "Free Category");
 
         mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validData)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is("Free Item")))
                 .andExpect(jsonPath("$.price", is(0)));
@@ -285,8 +286,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData(null, null, 0, null);
 
         mockMvc.perform(put("/shopping-items/{id}", item.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -296,8 +297,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(-5), 1, "Category");
 
         mockMvc.perform(put("/shopping-items/{id}", item.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -307,8 +308,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), 0, "Category");
 
         mockMvc.perform(put("/shopping-items/{id}", item.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidData)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -317,8 +318,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData updateData = new ShoppingItemData("Item", BigDecimal.valueOf(10), 1, "Category");
 
         mockMvc.perform(put("/shopping-items/{id}", 99999)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateData)))
                 .andExpect(status().isNotFound());
     }
 
@@ -333,8 +334,8 @@ public class ShoppingItemIntegrationTest {
         ShoppingItemData createData = new ShoppingItemData("Workflow Item", BigDecimal.valueOf(12.50), 4, "Workflow Category");
 
         String createResponse = mockMvc.perform(post("/shopping-items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createData)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
@@ -347,8 +348,8 @@ public class ShoppingItemIntegrationTest {
 
         ShoppingItemData updateData = new ShoppingItemData("Updated Workflow Item", BigDecimal.valueOf(20.00), 2, "Updated Category");
         mockMvc.perform(put("/shopping-items/{id}", itemId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateData)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateData)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Updated Workflow Item")))
                 .andExpect(jsonPath("$.cost", is(40.00)));
