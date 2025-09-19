@@ -200,13 +200,108 @@ public class ShoppingItemIntegrationTest {
     }
 
     @Test
-    void shouldValidateCreateRequest() throws Exception {
-        ShoppingItemData invalidData = new ShoppingItemData(null, null, -1, null);
+    void shouldValidateRequiredFieldsOnCreate() throws Exception {
+        ShoppingItemData invalidData = new ShoppingItemData(null, null, 0, null);
 
         mockMvc.perform(post("/shopping-items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidData)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldValidateBlankNameOnCreate() throws Exception {
+        ShoppingItemData invalidData = new ShoppingItemData("", BigDecimal.valueOf(10), 1, "Category");
+
+        mockMvc.perform(post("/shopping-items")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldValidateBlankCategoryOnCreate() throws Exception {
+        ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), 1, "");
+
+        mockMvc.perform(post("/shopping-items")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldValidateNegativePriceOnCreate() throws Exception {
+        ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(-1), 1, "Category");
+
+        mockMvc.perform(post("/shopping-items")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldValidateZeroQuantityOnCreate() throws Exception {
+        ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), 0, "Category");
+
+        mockMvc.perform(post("/shopping-items")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldValidateNegativeQuantityOnCreate() throws Exception {
+        ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), -1, "Category");
+
+        mockMvc.perform(post("/shopping-items")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldAllowZeroPriceOnCreate() throws Exception {
+        ShoppingItemData validData = new ShoppingItemData("Free Item", BigDecimal.ZERO, 1, "Free Category");
+
+        mockMvc.perform(post("/shopping-items")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validData)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is("Free Item")))
+                .andExpect(jsonPath("$.price", is(0)));
+    }
+
+    @Test
+    void shouldValidateRequiredFieldsOnUpdate() throws Exception {
+        ShoppingItem item = repository.save(new ShoppingItem("Test Item", BigDecimal.valueOf(10), 1, "Category"));
+        ShoppingItemData invalidData = new ShoppingItemData(null, null, 0, null);
+
+        mockMvc.perform(put("/shopping-items/{id}", item.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldValidateNegativePriceOnUpdate() throws Exception {
+        ShoppingItem item = repository.save(new ShoppingItem("Test Item", BigDecimal.valueOf(10), 1, "Category"));
+        ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(-5), 1, "Category");
+
+        mockMvc.perform(put("/shopping-items/{id}", item.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldValidateZeroQuantityOnUpdate() throws Exception {
+        ShoppingItem item = repository.save(new ShoppingItem("Test Item", BigDecimal.valueOf(10), 1, "Category"));
+        ShoppingItemData invalidData = new ShoppingItemData("Item", BigDecimal.valueOf(10), 0, "Category");
+
+        mockMvc.perform(put("/shopping-items/{id}", item.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidData)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

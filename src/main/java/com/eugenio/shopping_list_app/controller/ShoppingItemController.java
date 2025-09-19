@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,7 +56,7 @@ public class ShoppingItemController {
         @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     public ResponseEntity<ShoppingItem> create(
-            @Parameter(description = "Shopping item data to create") @RequestBody ShoppingItemData request){
+            @Parameter(description = "Shopping item data to create") @Valid @RequestBody ShoppingItemData request){
         var saved = this.shoppingItemService.saveOrUpdate(TO_ENTITY.apply(request));
         return ResponseEntity.status(201).body(saved);
     }
@@ -92,7 +93,7 @@ public class ShoppingItemController {
     })
     public ResponseEntity<ShoppingItem> update(
             @Parameter(description = "Shopping item ID") @PathVariable("id") long id, 
-            @Parameter(description = "Updated shopping item data") @RequestBody ShoppingItemData request) {
+            @Parameter(description = "Updated shopping item data") @Valid @RequestBody ShoppingItemData request) {
         var shoppingItem = retrieveShoppingItem(id);
         shoppingItem.setCategory(request.category());
         shoppingItem.setName(request.name());
